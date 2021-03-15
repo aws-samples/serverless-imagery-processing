@@ -1,0 +1,160 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: 'AWS::Serverless-2016-10-31'
+Description: An AWS Serverless Specification template describing your function.
+Resources:
+  ImageIngest:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Handler: lambda_function.lambda_handler
+      Runtime: python3.7
+      CodeUri: image_ingest/
+      Description: ''
+      MemorySize: 128
+      Timeout: 3
+      Events:
+        BucketEvent1:
+          Type: S3
+          Properties:
+            Bucket:
+              Ref: ImageryInputBucket
+            Events:
+              - 's3:ObjectCreated:*'
+      Environment:
+        Variables:
+          DUPLICATE_CHIPPERS: '2'
+          OUTPUT_QUEUE:
+            Fn::GetAtt: 
+              - "ChippingQueue"
+              - "QueueName"
+      Policies:
+        - AmazonSQSFullAccess
+
+
+
+  ImageChipper:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Handler: lambda_function.lambda_handler
+      Runtime: python3.7
+      CodeUri: image_chipper/
+      Description: ''
+      MemorySize: 3008
+      Timeout: 600
+      Events:
+        SQS1:
+          Type: SQS
+          Properties:
+            Queue:
+              'Fn::GetAtt':
+                - ChippingQueue
+                - Arn
+            BatchSize: 1
+      Environment:
+        Variables:
+          CHIP_BUCKET: !Ref ChipsBucket
+          CHIP_INFO_BUCKET: !Ref ChipInfoBucket
+          STRIDE_X_DIM: '400'
+          STRIDE_Y_DIM: '400'
+          WINDOW_X_DIM: '512'
+          WINDOW_Y_DIM: '512'
+      Policies:
+        - AmazonS3FullAccess
+
+
+  DeChipper:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Handler: lambda_function.lambda_handler
+      Runtime: python3.7
+      CodeUri: de_chipper/
+      Description: ''
+      MemorySize: 128
+      Timeout: 3
+      Events:
+        SQS1:
+          Type: SQS
+          Properties:
+            Queue:
+              'Fn::GetAtt':
+                - DeChippingQueue
+                - Arn
+            BatchSize: 1
+      Environment:
+        Variables:
+          OUTPUT_BUCKET: !Ref OutputBucket
+      Policies:
+        - AmazonS3FullAccess
+
+#  RekognitionInference:
+#    Type: 'AWS::Serverless::Function'
+#    Properties:
+#      Handler: lambda_function.lambda_handler
+#      Runtime: python3.7
+#      CodeUri: rekognition_inference/
+#      Description: ''
+#      MemorySize: 128
+#      Timeout: 3
+#      Events:
+#        BucketEvent1:
+#          Type: S3
+#          Properties:
+#            Bucket:
+#              Ref: ChipsBucket
+#            Events:
+#              - 's3:ObjectCreated:*'
+#      Environment:
+#        Variables:
+#          CHIP_PREDICTIONS_BUCKET: !Ref PredictionsBucket
+#      Policies:
+#        - AmazonRekognitionFullAccess
+#        - AmazonS3FullAccess
+
+  PredictionDetection:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Handler: lambda_function.lambda_handler
+      Runtime: python3.7
+      CodeUri: prediction_detection/
+      Description: ''
+      MemorySize: 128
+      Timeout: 3
+      Events:
+        BucketEvent1:
+          Type: S3
+          Properties:
+            Bucket:
+              Ref: PredictionsBucket
+            Events:
+              - 's3:ObjectCreated:*'
+      Environment:
+        Variables:
+          CHIP_INFO_BUCKET: !Ref ChipInfoBucket
+          PREDICTION_QUEUE: 
+            Fn::GetAtt: 
+              - "DeChippingQueue"
+              - "QueueName"
+      Policies:
+        - AmazonSQSFullAccess
+        - AmazonS3FullAccess
+
+  ImageryInputBucket:
+    Type: 'AWS::S3::Bucket'
+  ChipsBucket:
+    Type: 'AWS::S3::Bucket'
+  ChipInfoBucket:
+    Type: 'AWS::S3::Bucket'
+  PredictionsBucket:
+    Type: 'AWS::S3::Bucket'
+  OutputBucket:
+    Type: 'AWS::S3::Bucket'
+
+
+  ChippingQueue:
+    Type: 'AWS::SQS::Queue'
+    Properties: {
+      "VisibilityTimeout":601
+    }
+
+  DeChippingQueue:
+    Type: 'AWS::SQS::Queue'
+    Properties: {}  

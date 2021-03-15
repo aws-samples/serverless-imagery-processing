@@ -1,17 +1,26 @@
-## My Project
+## Processing satellite imagery with AWS serverless architecture
 
-TODO: Fill this README out!
 
-Be sure to:
 
-* Change the title in this README
-* Edit your repository description on GitHub
+### Introduction
 
-## Security
+Copy paste from blog
 
-See [CONTRIBUTING](CONTRIBUTING.md#security-issue-notifications) for more information.
+### Install dependencies
 
-## License
+Aws SAM
+
+### Documentation
+
+Description of various packages
+
+How to deploy
+
+How to modify to use rek
+
+Link to blog post
+
+### License
 
 This library is licensed under the MIT-0 License. See the LICENSE file.
 
