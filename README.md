@@ -25,7 +25,7 @@ Deploy the AWS SAM application:
 sam deploy –guided
 ```
 
-The current inference engine in the pipeline is Rekognition. This is commented out so you do not incur unexpected costs.  See the blog post for more information, [Processing Imagery with Serverless Architecture](https://aws.amazon.com/blogs/aws/) TODO change the link once blog is live.
+The current inference engine in the pipeline is Rekognition. This is commented out so you do not incur unexpected costs.  See the blog post for more information, [Processing Imagery with Serverless Architecture](https://aws.amazon.com/blogs/compute/processing-satellite-imagery-with-serverless-architecture/).
 ### License
 
 This library is licensed under the MIT-0 License. See the LICENSE file.
