@@ -139,22 +139,50 @@ Resources:
 
   ImageryInputBucket:
     Type: 'AWS::S3::Bucket'
+    Properties: 
+      BucketEncryption: 
+        ServerSideEncryptionConfiguration: 
+        - ServerSideEncryptionByDefault:
+            SSEAlgorithm: AES256
   ChipsBucket:
     Type: 'AWS::S3::Bucket'
+    Properties: 
+      BucketEncryption: 
+        ServerSideEncryptionConfiguration: 
+        - ServerSideEncryptionByDefault:
+            SSEAlgorithm: AES256
   ChipInfoBucket:
     Type: 'AWS::S3::Bucket'
+    Properties: 
+      BucketEncryption: 
+        ServerSideEncryptionConfiguration: 
+        - ServerSideEncryptionByDefault:
+            SSEAlgorithm: AES256
   PredictionsBucket:
     Type: 'AWS::S3::Bucket'
+    Properties: 
+      BucketEncryption: 
+        ServerSideEncryptionConfiguration: 
+        - ServerSideEncryptionByDefault:
+            SSEAlgorithm: AES256
   OutputBucket:
     Type: 'AWS::S3::Bucket'
+    Properties: 
+      BucketEncryption: 
+        ServerSideEncryptionConfiguration: 
+        - ServerSideEncryptionByDefault:
+            SSEAlgorithm: AES256
 
 
   ChippingQueue:
     Type: 'AWS::SQS::Queue'
     Properties: {
       "VisibilityTimeout":601
+      "KmsMasterKeyId":"alias/aws/sqs"
     }
 
   DeChippingQueue:
     Type: 'AWS::SQS::Queue'
-    Properties: {}  
+    Properties: {
+      "KmsMasterKeyId":"alias/aws/sqs"
+    }  
